@@ -1,0 +1,111 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Bio - Dark Mode</title>
+  <style>
+    /* General styles */
+body {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+a {
+  color: #00ffcc;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #ffcc00;
+}
+
+/* Header styles */
+header {
+  background-color: #333;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Main content styles */
+section {
+  display: flex;
+  flex-direction: column; /* Changed to column for mobile layout */
+  align-items: center; /* Center items horizontally in the column */
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Left sidebar styles */
+.sidebar {
+  width: 100%; /* Full width on mobile */
+  background-color: #222;
+  padding: 20px;
+  border-right: none; /* Remove border for mobile layout */
+  box-sizing: border-box; /* Ensure padding is included in width */
+  text-align: center; /* Center text in the sidebar */
+}
+
+.sidebar h2 {
+  color: #ffcc00;
+  margin-bottom: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 10px;
+}
+
+.sidebar a {
+  color: #fff;
+}
+
+.sidebar a:hover {
+  color: #ffcc00;
+}
+
+/* Main content styles */
+.content {
+  width: 100%; /* Full width on mobile */
+  padding: 20px;
+}
+
+.content h1 {
+  color: #ffcc00;
+}
+
+.content p {
+  line-height: 1.6;
+}
+
+  </style>
+<style type="text/css" id="operaUserStyle"></style></head>
+
+<body>
+
+  <header>
+    <h1>Sri Krishna' lounge</h1>
+  </header>
+
+  <section>
+    <div class="sidebar">
+      <h2>Navigation</h2>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div class="content">
+      <div style="display: flex; align-items: center;">
+        Welcome to my lounge. This website will the future home to all of my projects. Have a look around and let me know what you think about this website.  <br><br> Note that this site is still under construction 🚧.</body></html>

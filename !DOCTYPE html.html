@@ -29,29 +29,26 @@
     header {
       background-color: #333;
       padding: 20px;
+      text-align: center;
     }
 
     /* Main content styles */
     section {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start; /* Align items to the left */
+      flex-direction: column; /* Changed to column for mobile layout */
       max-width: 1000px;
       margin: 20px auto;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-      position: relative; /* Added position: relative */
     }
 
     /* Left sidebar styles */
     .sidebar {
-      width: 100%;
+      width: 100%; /* Full width on mobile */
       background-color: #222;
       padding: 20px;
-      border-right: none;
-      box-sizing: border-box;
-      display: none;
+      border-right: none; /* Remove border for mobile layout */
     }
 
     .sidebar h2 {
@@ -76,32 +73,8 @@
       color: #ffcc00;
     }
 
-    /* Button styles */
-    .open-sidebar-btn {
-      background-color: #333;
-      color: #fff;
-      border: none;
-      padding: 5px; /* Adjusted padding to make it smaller */
-      cursor: pointer;
-      position: absolute; /* Position the button absolute */
-      top: 10px; /* Adjust the top value as needed */
-      left: 10px; /* Adjust the left value as needed */
-    }
-
-    /* Media query for smaller screens */
-    @media (max-width: 768px) {
-      .sidebar {
-        display: block;
-      }
-
-      .open-sidebar-btn {
-        display: block;
-      }
-    }
-
     /* Main content styles */
     .content {
-      width: 100%;
       padding: 20px;
     }
 
@@ -113,7 +86,6 @@
       line-height: 1.6;
     }
   </style>
-  <style type="text/css" id="operaUserStyle"></style>
 </head>
 
 <body>
@@ -123,14 +95,13 @@
   </header>
 
   <section>
-    <button class="open-sidebar-btn" onclick="toggleSidebar()">☰</button>
-    <div class="sidebar" style="display: none;">
+    <div class="sidebar">
       <h2>Navigation</h2>
       <ul>
         <li><a href="#">Home</a></li>
-        <li><a href="projects2.html">Projects</a></li>
-        <li><a href="about2.html">About</a></li>
-        <li><a href="contact2.html">Contact</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
       </ul>
     </div>
     <div class="content">
@@ -139,14 +110,6 @@
       </div>
     </div>
   </section>
-
-  <script>
-    function toggleSidebar() {
-      var sidebar = document.querySelector('.sidebar');
-      sidebar.style.display = (sidebar.style.display === 'none' || sidebar.style.display === '') ? 'block' : 'none';
-    }
-  </script>
-
 </body>
 
 </html>
