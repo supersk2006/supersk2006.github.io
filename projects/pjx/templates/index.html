@@ -26,13 +26,7 @@
     <!-- Transaction Form -->
     <form id="transaction-form">
         <label for="date">Date:</label>
-        <input type="date" id="date" required><br><br>
-
-        <label for="purpose">Purpose:</label>
-        <input type="text" id="purpose" required><br><br>
-
-        <label for="time">Time:</label>
-        <input type="time" id="time" required><br><br>
+        <input type="date" id="date"><br><br>
 
         <label for="amount">Amount:</label>
         <input type="number" id="amount" step="0.01" required><br><br>
@@ -48,6 +42,9 @@
             <option value="" disabled selected>Choose or Add New</option>
         </select>
         <input type="text" id="new-subcategory" placeholder="Add new subcategory"><br><br>
+
+        <label for="purpose">Purpose (optional):</label>
+        <input type="text" id="purpose"><br><br>
 
         <button type="submit">Add Transaction</button>
     </form>
@@ -74,10 +71,11 @@
         document.getElementById('transaction-form').addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const date = document.getElementById('date').value;
-            const purpose = document.getElementById('purpose').value;
-            const time = document.getElementById('time').value;
+            // Get values from the form
+            const dateInput = document.getElementById('date').value;
+            const date = dateInput ? dateInput : new Date().toISOString().split('T')[0]; // Use current date if not provided
             const amount = document.getElementById('amount').value;
+            const purpose = document.getElementById('purpose').value || "N/A"; // Default to "N/A" if not provided
 
             const categoryDropdown = document.getElementById('category');
             const subcategoryDropdown = document.getElementById('subcategory');
@@ -85,6 +83,7 @@
             const category = categoryDropdown.value || document.getElementById('new-category').value.trim();
             const subcategory = subcategoryDropdown.value || document.getElementById('new-subcategory').value.trim();
 
+            // Add new categories and subcategories if entered
             if (category) categories.add(category);
             if (subcategory) subcategories.add(subcategory);
 
@@ -92,7 +91,7 @@
             updateDropdown(subcategoryDropdown, subcategories);
 
             // Add transaction to the array
-            transactions.push({ date, purpose, time, amount, category, subcategory });
+            transactions.push({ date, amount, category, subcategory, purpose });
 
             // Clear form inputs
             e.target.reset();
@@ -102,8 +101,8 @@
         // Download last 5 transactions as CSV
         document.getElementById('download-csv').addEventListener('click', () => {
             const csvContent = "data:text/csv;charset=utf-8,"
-                + ["Date, Purpose, Time, Amount, Category, Subcategory", ...transactions.slice(-5).map(t => 
-                  `${t.date}, ${t.purpose}, ${t.time}, ${t.amount}, ${t.category}, ${t.subcategory}`)].join("\n");
+                + ["Date, Amount, Category, Subcategory, Purpose", ...transactions.slice(-5).map(t => 
+                  `${t.date}, ${t.amount}, ${t.category}, ${t.subcategory}, ${t.purpose}`)].join("\n");
 
             // Create a downloadable link
             const encodedUri = encodeURI(csvContent);
