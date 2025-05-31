@@ -130,6 +130,7 @@
     <button onclick="correctGrade()">Correct Grade</button>
     <button onclick="restart()">Restart</button>
     <button onclick="window.print()">Print</button>
+    <button onclick="downloadCSV()">Download CSV</button>
   </div>
 
   <div class="gpa-display">
@@ -146,6 +147,7 @@
         <th>Grade Point</th>
         <th>Grade × Credits</th>
         <th>Weightage</th>
+        <th>Semester</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -234,7 +236,6 @@
       ]
     };
 
-    // Mapping grade points to letter grades for display in table
     const gradeLetters = {
       10: "O",
       9: "A+",
@@ -247,10 +248,10 @@
     let selectedSemester = null;
     let currentCourseIndex = 0;
     let courses = [];
+    let courseSemesters = [];
     let grades = [];
     let resultTableBody = null;
 
-    // Populate semester dropdown
     const semesterSelect = document.getElementById("semesterSelect");
     Object.keys(courseData).forEach(sem => {
       const option = document.createElement("option");
@@ -272,8 +273,12 @@
         return;
       }
       courses = [];
+      courseSemesters = [];
       for (let sem of Object.keys(courseData)) {
-        courses = courses.concat(courseData[sem]);
+        for (const course of courseData[sem]) {
+          courses.push(course);
+          courseSemesters.push(sem);
+        }
         if (sem === selectedSemester) break;
       }
       currentCourseIndex = 0;
@@ -287,7 +292,8 @@
 
     function showNextCourse() {
       if (currentCourseIndex >= courses.length) {
-        courseDisplay.textContent = "🎉 All courses graded! Final CGPA: " + calculateCGPA().toFixed(2);
+        courseDisplay.textContent = `🎉 All courses graded! Final CGPA: ${calculateCGPA().toFixed(2)}`;
+        updateGPA();
         return;
       }
       const course = courses[currentCourseIndex];
@@ -320,6 +326,7 @@
       currentCourseIndex = 0;
       courses = [];
       grades = [];
+      courseSemesters = [];
       courseDisplay.textContent = "";
       liveGPA.textContent = "-";
       semWiseGPA.textContent = "";
@@ -356,30 +363,56 @@
           <td>${gradePoint}</td>
           <td>${weighted}</td>
           <td>${weightage}</td>
+          <td>${courseSemesters[i]}</td>
         `;
         resultTableBody.appendChild(row);
       }
     }
 
     function updateGPA() {
-      let totalCredits = 0;
-      let totalWeightedPoints = 0;
-
-      for (let i = 0; i < grades.length; i++) {
-        if (grades[i] === null) break;
-        totalCredits += courses[i].Credits;
-        totalWeightedPoints += grades[i] * courses[i].Credits;
-      }
-
-      if (totalCredits === 0) {
+      if (grades.every(g => g === null)) {
         liveGPA.textContent = "-";
         semWiseGPA.textContent = "";
         return;
       }
-      const gpa = totalWeightedPoints / totalCredits;
-      liveGPA.textContent = gpa.toFixed(2);
 
-      semWiseGPA.textContent = `Semester-wise GPA up to ${selectedSemester}: ${gpa.toFixed(2)}`;
+      // Calculate overall GPA (CGPA)
+      let totalCreditsAll = 0;
+      let totalWeightedPointsAll = 0;
+
+      // For semester-wise GPA calculation
+      const semCredits = {};
+      const semWeightedPoints = {};
+
+      for (let i = 0; i < grades.length; i++) {
+        if (grades[i] === null) break;
+        const sem = courseSemesters[i];
+        const credit = courses[i].Credits;
+        const gp = grades[i];
+        const weighted = credit * gp;
+
+        // Accumulate for overall CGPA
+        totalCreditsAll += credit;
+        totalWeightedPointsAll += weighted;
+
+        // Accumulate for semester-wise
+        if (!semCredits[sem]) semCredits[sem] = 0;
+        if (!semWeightedPoints[sem]) semWeightedPoints[sem] = 0;
+
+        semCredits[sem] += credit;
+        semWeightedPoints[sem] += weighted;
+      }
+
+      const cgpa = totalCreditsAll ? (totalWeightedPointsAll / totalCreditsAll) : 0;
+      liveGPA.textContent = cgpa.toFixed(2);
+
+      // Build semester-wise GPA string
+      let semGPAStrings = [];
+      for (const sem of Object.keys(semCredits)) {
+        const gpa = semWeightedPoints[sem] / semCredits[sem];
+        semGPAStrings.push(`${sem}: ${gpa.toFixed(2)}`);
+      }
+      semWiseGPA.textContent = "Semester-wise GPA: " + semGPAStrings.join(" | ");
     }
 
     function calculateCGPA() {
@@ -393,7 +426,55 @@
       }
       return totalCredits === 0 ? 0 : totalWeightedPoints / totalCredits;
     }
+
+    function downloadCSV() {
+      if (grades.every(g => g === null)) {
+        alert("No grades to export.");
+        return;
+      }
+      const header = ["Course Name", "Grade", "Credits", "Grade Point", "Grade × Credits", "Weightage", "Semester"];
+      let csvRows = [];
+      csvRows.push(header.join(","));
+
+      // Calculate total weighted points for weightage calculation
+      let totalWeightedPoints = 0;
+      for (let i = 0; i < grades.length; i++) {
+        if (grades[i] === null) break;
+        totalWeightedPoints += grades[i] * courses[i].Credits;
+      }
+
+      for (let i = 0; i < grades.length; i++) {
+        if (grades[i] === null) continue;
+        const course = courses[i];
+        const credit = course.Credits;
+        const gradePoint = grades[i];
+        const weighted = credit * gradePoint;
+        const weightage = totalWeightedPoints ? (weighted / totalWeightedPoints).toFixed(3) : "0.000";
+        const gradeLetter = gradeLetters[gradePoint];
+        const sem = courseSemesters[i];
+        const row = [
+          `"${course["Course Name"]}"`,
+          gradeLetter,
+          credit,
+          gradePoint,
+          weighted,
+          weightage,
+          sem
+        ];
+        csvRows.push(row.join(","));
+      }
+
+      const csvString = csvRows.join("\n");
+      const blob = new Blob([csvString], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "grades.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
   </script>
 </body>
 </html>
-
