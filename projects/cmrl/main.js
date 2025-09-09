@@ -1,4 +1,4 @@
-// --- [Code from sections 1 & 2 is unchanged] ---
+// --- 1. CONFIGURATION AND SETUP ---
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 800;
 const PADDING = 60;
@@ -9,6 +9,8 @@ const routeData = {};
 const linePaths = {}; 
 const lineStops = {}; 
 let generatedTrips = [];
+
+// --- 2. HELPER FUNCTIONS ---
 function project(lat, lon) {
     const effectiveWidth = MAP_WIDTH - 2 * PADDING;
     const effectiveHeight = MAP_HEIGHT - 2 * PADDING;
@@ -37,7 +39,7 @@ function preprocessData(data) {
     data.stops.forEach(stop => { stationData[stop.stop_id] = stop; });
     data.routes.forEach(route => { routeData[route.route_id] = route; });
     
-    // **FIX:** Corrected the station order for the Green Line
+    // **FINAL CORRECTED ORDER** for all lines
     lineStops['blue-line-down'] = ['wimco-nagar-depot', 'wimco-nagar', 'tiruvottriyur', 'tiruvottriyur-theradi', 'kaladipet', 'tollgate', 'new-washermanpet', 'tondiarpet', 'sir-theagaraya-college', 'washermanpet', 'mannadi', 'high-court', 'central-metro', 'government-estate', 'lic', 'thousand-lights', 'ag-dms', 'teynampet', 'nandanam', 'saidapet', 'little-mount', 'guindy', 'alandur', 'nanganallur-road', 'meenambakkam', 'airport'];
     lineStops['blue-line-up'] = [...lineStops['blue-line-down']].reverse();
     lineStops['green-line-down'] = ['central-metro', 'egmore', 'nehru-park', 'kilpauk-medical-college', 'pachaiyappas-college', 'shenoy-nagar', 'anna-nagar-east', 'anna-nagar-tower', 'thirumangalam', 'koyambedu', 'cmbt', 'arumbakkam', 'vadapalani', 'ashok-nagar', 'ekkattuthangal', 'alandur', 'st-thomas-mount'];
@@ -90,7 +92,7 @@ function distributeAndDrawStations() {
             svg.appendChild(circle);
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', stop.visualPosition.x);
-            text.setAttribute('y', stop.visualPosition.y + 20);
+            text.setAttribute('y', stop.visualPosition.y - 10); // Position text above the circle
             text.setAttribute('text-anchor', 'middle');
             text.setAttribute('font-size', '10');
             text.setAttribute('fill', 'white');
@@ -126,7 +128,6 @@ function generateInitialTrips(data) {
                     id: tripId, 
                     routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', 
                     direction: routeId.includes('up') ? 'up' : 'down', 
-                    // **FIX:** Better randomization to prevent grouping
                     startTime: t - (Math.random() * 3600) 
                 });
             }
@@ -198,4 +199,4 @@ async function main() {
     requestAnimationFrame(() => animationLoop(data));
 }
 
-main();	
+main();
