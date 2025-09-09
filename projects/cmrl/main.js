@@ -1,4 +1,4 @@
-// --- 1. CONFIGURATION AND SETUP ---
+// --- [Code from sections 1, 2, 3 is unchanged] ---
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 800;
 const PADDING = 60;
@@ -10,9 +10,7 @@ const stationData = {};
 const routeData = {}; 
 const linePaths = {}; 
 const lineStops = {}; 
-let generatedTrips = []; // Will hold our trains
-
-// --- 2. HELPER FUNCTIONS ---
+let generatedTrips = [];
 function project(lat, lon) {
     const effectiveWidth = MAP_WIDTH - 2 * PADDING;
     const effectiveHeight = MAP_HEIGHT - 2 * PADDING;
@@ -25,8 +23,6 @@ function timeToSeconds(timeStr) {
     const [h, m, s] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60 + s;
 }
-
-// --- 3. DATA LOADING AND PRE-PROCESSING ---
 async function loadData() {
     const [routes, stops, shapes, schedule, travelTimes] = await Promise.all([
         fetch('./data/routes.json').then(res => res.json()),
@@ -63,22 +59,35 @@ function renderMap(data) {
         linePaths[routeId] = path;
     }
 }
+// **REWRITTEN** function to fix label order, prevent duplicates, and add text labels
 function distributeAndDrawStations() {
+    const drawnStations = new Set(); // Keep track of stations we've already drawn
+
     for (const lineId in lineStops) {
+        // **FIX:** Only calculate positions based on the 'down' direction to prevent reversal
+        if (lineId.includes('up')) continue;
+
         const stopIds = lineStops[lineId];
         const routeId = lineId.includes('blue') ? 'blue-line' : 'green-line';
         const path = linePaths[routeId];
         if (!path) continue;
+        
         const totalLength = path.getTotalLength();
+
         stopIds.forEach((stopId, index) => {
+            // **FIX:** Only calculate position if we haven't already done it for an interchange
+            if (stationData[stopId].visualPosition) return;
+            
             const proportion = index / (stopIds.length - 1);
             const position = path.getPointAtLength(proportion * totalLength);
             stationData[stopId].visualPosition = position;
         });
     }
+
     for (const stopId in stationData) {
         const stop = stationData[stopId];
-        if (stop.visualPosition) {
+        if (stop.visualPosition && !drawnStations.has(stopId)) {
+            // Draw station circle
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', stop.visualPosition.x);
             circle.setAttribute('cy', stop.visualPosition.y);
@@ -86,33 +95,25 @@ function distributeAndDrawStations() {
             circle.setAttribute('fill', 'white');
             circle.setAttribute('stroke', '#333');
             circle.setAttribute('stroke-width', '2');
-            circle.style.cursor = 'pointer';
-            
-            // **MODIFIED** Click listener to show the custom tooltip
-            circle.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevents the map click event from firing
-                tooltip.style.display = 'block';
-                tooltip.textContent = stop.stop_name;
-                const mapRect = mapContainer.getBoundingClientRect();
-                tooltip.style.left = `${event.clientX - mapRect.left}px`;
-                tooltip.style.top = `${event.clientY - mapRect.top}px`;
-            });
-            
-            const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-            title.textContent = stop.stop_name;
-            circle.appendChild(title);
             svg.appendChild(circle);
+
+            // **NEW:** Draw station text label
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', stop.visualPosition.x);
+            text.setAttribute('y', stop.visualPosition.y + 20); // Position text below the circle
+            text.setAttribute('text-anchor', 'middle'); // Center the text
+            text.setAttribute('font-size', '10');
+            text.setAttribute('fill', 'white');
+            text.textContent = stop.stop_name;
+            svg.appendChild(text);
+
+            drawnStations.add(stopId); // Mark as drawn
         }
     }
-    // Add event listener to map to hide tooltip
-    svg.addEventListener('click', () => {
-        tooltip.style.display = 'none';
-    });
 }
 
 // --- 5. SIMULATION ENGINE ---
-
-// **NEW** Function to generate trips only ONCE
+let activeTrains = {};
 function generateInitialTrips(data) {
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
@@ -121,32 +122,23 @@ function generateInitialTrips(data) {
     const dayType = day === 0 ? 'sunday' : day === 6 ? 'saturday' : 'weekday';
     const currentSchedule = data.schedule[dayType];
     if (!currentSchedule) return;
-
     const period = currentSchedule.find(p => {
         const start = timeToSeconds(p.start);
         const end = timeToSeconds(p.end);
         return currentTimeInSeconds >= start && currentTimeInSeconds <= end;
     });
     if (!period) return;
-    
     for (const routeId in period.headways_mins) {
         const headwaySeconds = period.headways_mins[routeId] * 60;
         const serviceStartTime = timeToSeconds(currentSchedule[0].start);
         for (let t = serviceStartTime; t < currentTimeInSeconds; t += headwaySeconds) {
             const tripId = `${routeId}-${t}`;
             if (currentTimeInSeconds - t < 5000) { 
-                generatedTrips.push({ 
-                    id: tripId, 
-                    routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', 
-                    direction: routeId.includes('up') ? 'up' : 'down', 
-                    startTime: t - (Math.random() * headwaySeconds)
-                });
+                generatedTrips.push({ id: tripId, routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', direction: routeId.includes('up') ? 'up' : 'down', startTime: t - (Math.random() * headwaySeconds) });
             }
         }
     }
 }
-
-// **MODIFIED** Simpler animation loop
 function animationLoop(data) {
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
@@ -158,19 +150,15 @@ function animationLoop(data) {
         let trainPosition = null;
         const stopsOnLine = lineStops[trip.routeId + '-' + trip.direction];
         if (!stopsOnLine) return;
-        
         let totalTripTime = 0;
         for (let i = 0; i < stopsOnLine.length - 1; i++) {
             totalTripTime += data.travelTimes[`${stopsOnLine[i]}_${stopsOnLine[i+1]}`] || 150;
         }
-        
-        // If train has finished its journey, hide it.
-        if (timeSinceStart > totalTripTime) {
+        if (timeSinceStart > totalTripTime || timeSinceStart < 0) {
             let trainElement = document.getElementById(trip.id);
             if (trainElement) trainElement.style.display = 'none';
             return;
         }
-
         for (let i = 0; i < stopsOnLine.length - 1; i++) {
             const fromStopId = stopsOnLine[i];
             const toStopId = stopsOnLine[i + 1];
@@ -199,6 +187,7 @@ function animationLoop(data) {
                 trainElement.setAttribute('stroke-width', '2');
                 svg.appendChild(trainElement);
             }
+            trainElement.style.display = 'block';
             trainElement.setAttribute('cx', trainPosition.x);
             trainElement.setAttribute('cy', trainPosition.y);
         }
@@ -212,7 +201,7 @@ async function main() {
     preprocessData(data);
     renderMap(data); 
     distributeAndDrawStations();
-    generateInitialTrips(data); // Generate trains ONCE
+    generateInitialTrips(data);
     requestAnimationFrame(() => animationLoop(data));
 }
 
