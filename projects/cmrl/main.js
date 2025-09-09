@@ -1,13 +1,18 @@
-// --- [Code from sections 1, 2, 3 is unchanged] ---
+// --- 1. CONFIGURATION AND SETUP ---
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 800;
 const PADDING = 60;
 const bounds = { minLon: 80.1691, maxLon: 80.3134, minLat: 12.9890, maxLat: 13.1868 };
 const svg = document.getElementById('metro-map');
+const tooltip = document.getElementById('tooltip');
+const mapContainer = document.getElementById('map-container');
 const stationData = {}; 
 const routeData = {}; 
 const linePaths = {}; 
 const lineStops = {}; 
+let generatedTrips = []; // Will hold our trains
+
+// --- 2. HELPER FUNCTIONS ---
 function project(lat, lon) {
     const effectiveWidth = MAP_WIDTH - 2 * PADDING;
     const effectiveHeight = MAP_HEIGHT - 2 * PADDING;
@@ -20,6 +25,8 @@ function timeToSeconds(timeStr) {
     const [h, m, s] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60 + s;
 }
+
+// --- 3. DATA LOADING AND PRE-PROCESSING ---
 async function loadData() {
     const [routes, stops, shapes, schedule, travelTimes] = await Promise.all([
         fetch('./data/routes.json').then(res => res.json()),
@@ -79,11 +86,16 @@ function distributeAndDrawStations() {
             circle.setAttribute('fill', 'white');
             circle.setAttribute('stroke', '#333');
             circle.setAttribute('stroke-width', '2');
-            
-            // **NEW** Make stations clickable
             circle.style.cursor = 'pointer';
-            circle.addEventListener('click', () => {
-                alert(stop.stop_name);
+            
+            // **MODIFIED** Click listener to show the custom tooltip
+            circle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevents the map click event from firing
+                tooltip.style.display = 'block';
+                tooltip.textContent = stop.stop_name;
+                const mapRect = mapContainer.getBoundingClientRect();
+                tooltip.style.left = `${event.clientX - mapRect.left}px`;
+                tooltip.style.top = `${event.clientY - mapRect.top}px`;
             });
             
             const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
@@ -92,48 +104,73 @@ function distributeAndDrawStations() {
             svg.appendChild(circle);
         }
     }
+    // Add event listener to map to hide tooltip
+    svg.addEventListener('click', () => {
+        tooltip.style.display = 'none';
+    });
 }
 
 // --- 5. SIMULATION ENGINE ---
-let activeTrains = {};
-function animationLoop(data) {
+
+// **NEW** Function to generate trips only ONCE
+function generateInitialTrips(data) {
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     const currentTimeInSeconds = nowIST.getHours() * 3600 + nowIST.getMinutes() * 60 + nowIST.getSeconds();
     const day = nowIST.getDay();
     const dayType = day === 0 ? 'sunday' : day === 6 ? 'saturday' : 'weekday';
     const currentSchedule = data.schedule[dayType];
-    if (!currentSchedule) { requestAnimationFrame(() => animationLoop(data)); return; }
+    if (!currentSchedule) return;
+
     const period = currentSchedule.find(p => {
         const start = timeToSeconds(p.start);
         const end = timeToSeconds(p.end);
         return currentTimeInSeconds >= start && currentTimeInSeconds <= end;
     });
-    if (!period) { requestAnimationFrame(() => animationLoop(data)); return; }
-    const allTrips = [];
+    if (!period) return;
+    
     for (const routeId in period.headways_mins) {
         const headwaySeconds = period.headways_mins[routeId] * 60;
         const serviceStartTime = timeToSeconds(currentSchedule[0].start);
         for (let t = serviceStartTime; t < currentTimeInSeconds; t += headwaySeconds) {
             const tripId = `${routeId}-${t}`;
-            if (currentTimeInSeconds - t < 5000) {
-                allTrips.push({ 
+            if (currentTimeInSeconds - t < 5000) { 
+                generatedTrips.push({ 
                     id: tripId, 
                     routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', 
                     direction: routeId.includes('up') ? 'up' : 'down', 
-                    fullRouteId: routeId, 
-                    // **NEW** Add randomization to the start time
                     startTime: t - (Math.random() * headwaySeconds)
                 });
             }
         }
     }
-    allTrips.forEach(trip => {
+}
+
+// **MODIFIED** Simpler animation loop
+function animationLoop(data) {
+    const now = new Date();
+    const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+    const currentTimeInSeconds = nowIST.getHours() * 3600 + nowIST.getMinutes() * 60 + nowIST.getSeconds();
+
+    generatedTrips.forEach(trip => {
         const timeSinceStart = currentTimeInSeconds - trip.startTime;
         let cumulativeTime = 0;
         let trainPosition = null;
         const stopsOnLine = lineStops[trip.routeId + '-' + trip.direction];
         if (!stopsOnLine) return;
+        
+        let totalTripTime = 0;
+        for (let i = 0; i < stopsOnLine.length - 1; i++) {
+            totalTripTime += data.travelTimes[`${stopsOnLine[i]}_${stopsOnLine[i+1]}`] || 150;
+        }
+        
+        // If train has finished its journey, hide it.
+        if (timeSinceStart > totalTripTime) {
+            let trainElement = document.getElementById(trip.id);
+            if (trainElement) trainElement.style.display = 'none';
+            return;
+        }
+
         for (let i = 0; i < stopsOnLine.length - 1; i++) {
             const fromStopId = stopsOnLine[i];
             const toStopId = stopsOnLine[i + 1];
@@ -161,7 +198,6 @@ function animationLoop(data) {
                 trainElement.setAttribute('stroke', 'white');
                 trainElement.setAttribute('stroke-width', '2');
                 svg.appendChild(trainElement);
-                activeTrains[trip.id] = trainElement;
             }
             trainElement.setAttribute('cx', trainPosition.x);
             trainElement.setAttribute('cy', trainPosition.y);
@@ -176,6 +212,7 @@ async function main() {
     preprocessData(data);
     renderMap(data); 
     distributeAndDrawStations();
+    generateInitialTrips(data); // Generate trains ONCE
     requestAnimationFrame(() => animationLoop(data));
 }
 
