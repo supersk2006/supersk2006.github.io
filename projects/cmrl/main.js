@@ -23,9 +23,15 @@ function timeToSeconds(timeStr) {
     const [h, m, s] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60 + s;
 }
+function getDistance(p1, p2) {
+    const dx = p1.x - p2.x;
+    const dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
 // --- 3. DATA LOADING AND PRE-PROCESSING ---
 async function loadData() {
+    // Code is unchanged
     const [routes, stops, shapes, schedule, travelTimes] = await Promise.all([
         fetch('./data/routes.json').then(res => res.json()),
         fetch('./data/stops.json').then(res => res.json()),
@@ -36,10 +42,9 @@ async function loadData() {
     return { routes, stops, shapes, schedule, travelTimes };
 }
 function preprocessData(data) {
+    // Code is unchanged
     data.stops.forEach(stop => { stationData[stop.stop_id] = stop; });
     data.routes.forEach(route => { routeData[route.route_id] = route; });
-    
-    // **FINAL CORRECTED ORDER** for all lines
     lineStops['blue-line-down'] = ['wimco-nagar-depot', 'wimco-nagar', 'tiruvottriyur', 'tiruvottriyur-theradi', 'kaladipet', 'tollgate', 'new-washermanpet', 'tondiarpet', 'sir-theagaraya-college', 'washermanpet', 'mannadi', 'high-court', 'central-metro', 'government-estate', 'lic', 'thousand-lights', 'ag-dms', 'teynampet', 'nandanam', 'saidapet', 'little-mount', 'guindy', 'alandur', 'nanganallur-road', 'meenambakkam', 'airport'];
     lineStops['blue-line-up'] = [...lineStops['blue-line-down']].reverse();
     lineStops['green-line-down'] = ['central-metro', 'egmore', 'nehru-park', 'kilpauk-medical-college', 'pachaiyappas-college', 'shenoy-nagar', 'anna-nagar-east', 'anna-nagar-tower', 'thirumangalam', 'koyambedu', 'cmbt', 'arumbakkam', 'vadapalani', 'ashok-nagar', 'ekkattuthangal', 'alandur', 'st-thomas-mount'];
@@ -48,6 +53,7 @@ function preprocessData(data) {
 
 // --- 4. MAP RENDERING ---
 function renderMap(data) {
+    // Code is unchanged
     const { shapes } = data;
     for (const routeId in shapes) {
         const route = routeData[routeId];
@@ -63,25 +69,43 @@ function renderMap(data) {
         linePaths[routeId] = path;
     }
 }
-function distributeAndDrawStations() {
-    const drawnStations = new Set(); 
-    for (const lineId in lineStops) {
-        if (lineId.includes('up')) continue;
-        const stopIds = lineStops[lineId];
-        const routeId = lineId.includes('blue') ? 'blue-line' : 'green-line';
-        const path = linePaths[routeId];
-        if (!path) continue;
-        const totalLength = path.getTotalLength();
-        stopIds.forEach((stopId, index) => {
-            if (stationData[stopId].visualPosition) return;
-            const proportion = index / (stopIds.length - 1);
-            const position = path.getPointAtLength(proportion * totalLength);
-            stationData[stopId].visualPosition = position;
+// **REWRITTEN** function to use geometric snapping for perfect alignment
+function snapAndDrawStations(data) {
+    const { stops } = data;
+    
+    // First, calculate the snapped position for every station
+    stops.forEach(stop => {
+        const realPos = project(stop.lat, stop.lon);
+        let bestPosition = null;
+        let minDistance = Infinity;
+
+        // An interchange station can be on multiple lines, so check all of them
+        stop.line.forEach(lineName => {
+            const routeId = lineName.includes('blue') ? 'blue-line' : 'green-line';
+            const path = linePaths[routeId];
+            if (!path) return;
+
+            const totalLength = path.getTotalLength();
+            // Iterate along the path to find the closest point. A larger step is faster.
+            for (let i = 0; i < totalLength; i += 2) { 
+                const pointOnPath = path.getPointAtLength(i);
+                const distance = getDistance(realPos, pointOnPath);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    bestPosition = pointOnPath;
+                }
+            }
         });
-    }
+        
+        if (bestPosition) {
+            stationData[stop.stop_id].visualPosition = bestPosition;
+        }
+    });
+
+    // Now draw all stations and labels using their final positions
     for (const stopId in stationData) {
         const stop = stationData[stopId];
-        if (stop.visualPosition && !drawnStations.has(stopId)) {
+        if (stop.visualPosition) {
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', stop.visualPosition.x);
             circle.setAttribute('cy', stop.visualPosition.y);
@@ -90,20 +114,24 @@ function distributeAndDrawStations() {
             circle.setAttribute('stroke', '#333');
             circle.setAttribute('stroke-width', '2');
             svg.appendChild(circle);
+
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', stop.visualPosition.x);
-            text.setAttribute('y', stop.visualPosition.y - 10); // Position text above the circle
+            text.setAttribute('y', stop.visualPosition.y - 10); // Position above the circle
             text.setAttribute('text-anchor', 'middle');
-            text.setAttribute('font-size', '10');
-            text.setAttribute('fill', 'white');
+            text.setAttribute('font-size', '9');
+            text.setAttribute('fill', '#ccc'); // Lighter color for less clutter
             text.textContent = stop.stop_name;
             svg.appendChild(text);
-            drawnStations.add(stopId);
         }
     }
 }
 
 // --- 5. SIMULATION ENGINE ---
+// This entire section is unchanged from the last working version
+function generateInitialTrips(data) { /* ... unchanged ... */ }
+function animationLoop(data) { /* ... unchanged ... */ }
+// Full code for section 5:
 function generateInitialTrips(data) {
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
@@ -124,12 +152,7 @@ function generateInitialTrips(data) {
         for (let t = serviceStartTime; t < currentTimeInSeconds; t += headwaySeconds) {
             const tripId = `${routeId}-${t}`;
             if (currentTimeInSeconds - t < 5000) { 
-                generatedTrips.push({ 
-                    id: tripId, 
-                    routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', 
-                    direction: routeId.includes('up') ? 'up' : 'down', 
-                    startTime: t - (Math.random() * 3600) 
-                });
+                generatedTrips.push({ id: tripId, routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', direction: routeId.includes('up') ? 'up' : 'down', startTime: t - (Math.random() * 3600) });
             }
         }
     }
@@ -194,7 +217,7 @@ async function main() {
     const data = await loadData();
     preprocessData(data);
     renderMap(data); 
-    distributeAndDrawStations();
+    snapAndDrawStations(data); // Reverted to the more accurate snapping method
     generateInitialTrips(data);
     requestAnimationFrame(() => animationLoop(data));
 }
