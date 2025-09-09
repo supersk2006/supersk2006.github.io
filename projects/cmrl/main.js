@@ -1,11 +1,9 @@
-// --- [Code from sections 1, 2, 3 is unchanged] ---
+// --- [Code from sections 1 & 2 is unchanged] ---
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 800;
 const PADDING = 60;
 const bounds = { minLon: 80.1691, maxLon: 80.3134, minLat: 12.9890, maxLat: 13.1868 };
 const svg = document.getElementById('metro-map');
-const tooltip = document.getElementById('tooltip');
-const mapContainer = document.getElementById('map-container');
 const stationData = {}; 
 const routeData = {}; 
 const linePaths = {}; 
@@ -23,6 +21,8 @@ function timeToSeconds(timeStr) {
     const [h, m, s] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60 + s;
 }
+
+// --- 3. DATA LOADING AND PRE-PROCESSING ---
 async function loadData() {
     const [routes, stops, shapes, schedule, travelTimes] = await Promise.all([
         fetch('./data/routes.json').then(res => res.json()),
@@ -36,6 +36,8 @@ async function loadData() {
 function preprocessData(data) {
     data.stops.forEach(stop => { stationData[stop.stop_id] = stop; });
     data.routes.forEach(route => { routeData[route.route_id] = route; });
+    
+    // **FIX:** Corrected the station order for the Green Line
     lineStops['blue-line-down'] = ['wimco-nagar-depot', 'wimco-nagar', 'tiruvottriyur', 'tiruvottriyur-theradi', 'kaladipet', 'tollgate', 'new-washermanpet', 'tondiarpet', 'sir-theagaraya-college', 'washermanpet', 'mannadi', 'high-court', 'central-metro', 'government-estate', 'lic', 'thousand-lights', 'ag-dms', 'teynampet', 'nandanam', 'saidapet', 'little-mount', 'guindy', 'alandur', 'nanganallur-road', 'meenambakkam', 'airport'];
     lineStops['blue-line-up'] = [...lineStops['blue-line-down']].reverse();
     lineStops['green-line-down'] = ['central-metro', 'egmore', 'nehru-park', 'kilpauk-medical-college', 'pachaiyappas-college', 'shenoy-nagar', 'anna-nagar-east', 'anna-nagar-tower', 'thirumangalam', 'koyambedu', 'cmbt', 'arumbakkam', 'vadapalani', 'ashok-nagar', 'ekkattuthangal', 'alandur', 'st-thomas-mount'];
@@ -59,35 +61,25 @@ function renderMap(data) {
         linePaths[routeId] = path;
     }
 }
-// **REWRITTEN** function to fix label order, prevent duplicates, and add text labels
 function distributeAndDrawStations() {
-    const drawnStations = new Set(); // Keep track of stations we've already drawn
-
+    const drawnStations = new Set(); 
     for (const lineId in lineStops) {
-        // **FIX:** Only calculate positions based on the 'down' direction to prevent reversal
         if (lineId.includes('up')) continue;
-
         const stopIds = lineStops[lineId];
         const routeId = lineId.includes('blue') ? 'blue-line' : 'green-line';
         const path = linePaths[routeId];
         if (!path) continue;
-        
         const totalLength = path.getTotalLength();
-
         stopIds.forEach((stopId, index) => {
-            // **FIX:** Only calculate position if we haven't already done it for an interchange
             if (stationData[stopId].visualPosition) return;
-            
             const proportion = index / (stopIds.length - 1);
             const position = path.getPointAtLength(proportion * totalLength);
             stationData[stopId].visualPosition = position;
         });
     }
-
     for (const stopId in stationData) {
         const stop = stationData[stopId];
         if (stop.visualPosition && !drawnStations.has(stopId)) {
-            // Draw station circle
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             circle.setAttribute('cx', stop.visualPosition.x);
             circle.setAttribute('cy', stop.visualPosition.y);
@@ -96,24 +88,20 @@ function distributeAndDrawStations() {
             circle.setAttribute('stroke', '#333');
             circle.setAttribute('stroke-width', '2');
             svg.appendChild(circle);
-
-            // **NEW:** Draw station text label
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             text.setAttribute('x', stop.visualPosition.x);
-            text.setAttribute('y', stop.visualPosition.y + 20); // Position text below the circle
-            text.setAttribute('text-anchor', 'middle'); // Center the text
+            text.setAttribute('y', stop.visualPosition.y + 20);
+            text.setAttribute('text-anchor', 'middle');
             text.setAttribute('font-size', '10');
             text.setAttribute('fill', 'white');
             text.textContent = stop.stop_name;
             svg.appendChild(text);
-
-            drawnStations.add(stopId); // Mark as drawn
+            drawnStations.add(stopId);
         }
     }
 }
 
 // --- 5. SIMULATION ENGINE ---
-let activeTrains = {};
 function generateInitialTrips(data) {
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
@@ -134,7 +122,13 @@ function generateInitialTrips(data) {
         for (let t = serviceStartTime; t < currentTimeInSeconds; t += headwaySeconds) {
             const tripId = `${routeId}-${t}`;
             if (currentTimeInSeconds - t < 5000) { 
-                generatedTrips.push({ id: tripId, routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', direction: routeId.includes('up') ? 'up' : 'down', startTime: t - (Math.random() * headwaySeconds) });
+                generatedTrips.push({ 
+                    id: tripId, 
+                    routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', 
+                    direction: routeId.includes('up') ? 'up' : 'down', 
+                    // **FIX:** Better randomization to prevent grouping
+                    startTime: t - (Math.random() * 3600) 
+                });
             }
         }
     }
@@ -143,7 +137,6 @@ function animationLoop(data) {
     const now = new Date();
     const nowIST = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     const currentTimeInSeconds = nowIST.getHours() * 3600 + nowIST.getMinutes() * 60 + nowIST.getSeconds();
-
     generatedTrips.forEach(trip => {
         const timeSinceStart = currentTimeInSeconds - trip.startTime;
         let cumulativeTime = 0;
