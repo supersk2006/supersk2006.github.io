@@ -1,27 +1,18 @@
-// --- 1. CONFIGURATION AND SETUP ---
+// --- [Code from sections 1, 2, 3 is unchanged] ---
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 800;
-const PADDING = 60; // Adds empty space around the map
-
-// Geographic bounding box for Chennai Metro
+const PADDING = 60;
 const bounds = { minLon: 80.1691, maxLon: 80.3134, minLat: 12.9890, maxLat: 13.1868 };
-
-// DOM Elements
 const svg = document.getElementById('metro-map');
 const stationData = {}; 
 const routeData = {}; 
 const linePaths = {}; 
 const lineStops = {}; 
-
-// --- 2. HELPER FUNCTIONS ---
-// **MODIFIED** project function to include padding
 function project(lat, lon) {
     const effectiveWidth = MAP_WIDTH - 2 * PADDING;
     const effectiveHeight = MAP_HEIGHT - 2 * PADDING;
-    
     let x = ((lon - bounds.minLon) / (bounds.maxLon - bounds.minLon)) * effectiveWidth + PADDING;
     let y = (MAP_HEIGHT - PADDING) - (((lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * effectiveHeight);
-    
     return { x, y };
 }
 function timeToSeconds(timeStr) {
@@ -29,8 +20,6 @@ function timeToSeconds(timeStr) {
     const [h, m, s] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60 + s;
 }
-
-// --- 3. DATA LOADING AND PRE-PROCESSING ---
 async function loadData() {
     const [routes, stops, shapes, schedule, travelTimes] = await Promise.all([
         fetch('./data/routes.json').then(res => res.json()),
@@ -67,28 +56,19 @@ function renderMap(data) {
         linePaths[routeId] = path;
     }
 }
-
-// **REWRITTEN** function to distribute stations evenly
 function distributeAndDrawStations() {
-    // Process each line and direction to calculate station positions
     for (const lineId in lineStops) {
         const stopIds = lineStops[lineId];
         const routeId = lineId.includes('blue') ? 'blue-line' : 'green-line';
         const path = linePaths[routeId];
         if (!path) continue;
-
         const totalLength = path.getTotalLength();
-
         stopIds.forEach((stopId, index) => {
             const proportion = index / (stopIds.length - 1);
             const position = path.getPointAtLength(proportion * totalLength);
-            
-            // Store this calculated position. Interchange stations will be updated multiple times, which is fine.
             stationData[stopId].visualPosition = position;
         });
     }
-
-    // Now draw all stations using their final calculated positions
     for (const stopId in stationData) {
         const stop = stationData[stopId];
         if (stop.visualPosition) {
@@ -99,6 +79,13 @@ function distributeAndDrawStations() {
             circle.setAttribute('fill', 'white');
             circle.setAttribute('stroke', '#333');
             circle.setAttribute('stroke-width', '2');
+            
+            // **NEW** Make stations clickable
+            circle.style.cursor = 'pointer';
+            circle.addEventListener('click', () => {
+                alert(stop.stop_name);
+            });
+            
             const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
             title.textContent = stop.stop_name;
             circle.appendChild(title);
@@ -130,7 +117,14 @@ function animationLoop(data) {
         for (let t = serviceStartTime; t < currentTimeInSeconds; t += headwaySeconds) {
             const tripId = `${routeId}-${t}`;
             if (currentTimeInSeconds - t < 5000) {
-                allTrips.push({ id: tripId, routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', direction: routeId.includes('up') ? 'up' : 'down', fullRouteId: routeId, startTime: t });
+                allTrips.push({ 
+                    id: tripId, 
+                    routeId: routeId.includes('blue') ? 'blue-line' : 'green-line', 
+                    direction: routeId.includes('up') ? 'up' : 'down', 
+                    fullRouteId: routeId, 
+                    // **NEW** Add randomization to the start time
+                    startTime: t - (Math.random() * headwaySeconds)
+                });
             }
         }
     }
@@ -181,7 +175,7 @@ async function main() {
     const data = await loadData();
     preprocessData(data);
     renderMap(data); 
-    distributeAndDrawStations(); // **MODIFIED** function call
+    distributeAndDrawStations();
     requestAnimationFrame(() => animationLoop(data));
 }
 
