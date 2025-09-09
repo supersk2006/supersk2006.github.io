@@ -1,18 +1,27 @@
-// --- [Code from sections 1, 2, and 3 is unchanged] ---
 // --- 1. CONFIGURATION AND SETUP ---
 const MAP_WIDTH = 1200;
 const MAP_HEIGHT = 800;
+const PADDING = 60; // Adds empty space around the map
+
+// Geographic bounding box for Chennai Metro
 const bounds = { minLon: 80.1691, maxLon: 80.3134, minLat: 12.9890, maxLat: 13.1868 };
+
+// DOM Elements
 const svg = document.getElementById('metro-map');
-const stationData = {};
-const routeData = {};
-const linePaths = {};
-const lineStops = {};
+const stationData = {}; 
+const routeData = {}; 
+const linePaths = {}; 
+const lineStops = {}; 
 
 // --- 2. HELPER FUNCTIONS ---
+// **MODIFIED** project function to include padding
 function project(lat, lon) {
-    const x = ((lon - bounds.minLon) / (bounds.maxLon - bounds.minLon)) * MAP_WIDTH;
-    const y = MAP_HEIGHT - (((lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * MAP_HEIGHT);
+    const effectiveWidth = MAP_WIDTH - 2 * PADDING;
+    const effectiveHeight = MAP_HEIGHT - 2 * PADDING;
+    
+    let x = ((lon - bounds.minLon) / (bounds.maxLon - bounds.minLon)) * effectiveWidth + PADDING;
+    let y = (MAP_HEIGHT - PADDING) - (((lat - bounds.minLat) / (bounds.maxLat - bounds.minLat)) * effectiveHeight);
+    
     return { x, y };
 }
 function timeToSeconds(timeStr) {
@@ -20,13 +29,6 @@ function timeToSeconds(timeStr) {
     const [h, m, s] = timeStr.split(':').map(Number);
     return h * 3600 + m * 60 + s;
 }
-// NEW HELPER FUNCTION to calculate distance between two points
-function getDistance(p1, p2) {
-    const dx = p1.x - p2.x;
-    const dy = p1.y - p2.y;
-    return Math.sqrt(dx * dx + dy * dy);
-}
-
 
 // --- 3. DATA LOADING AND PRE-PROCESSING ---
 async function loadData() {
@@ -49,8 +51,6 @@ function preprocessData(data) {
 }
 
 // --- 4. MAP RENDERING ---
-
-// **MODIFIED** renderMap function. It no longer draws the stations immediately.
 function renderMap(data) {
     const { shapes } = data;
     for (const routeId in shapes) {
@@ -61,57 +61,52 @@ function renderMap(data) {
         path.setAttribute('stroke', route ? route.color : '#555');
         path.setAttribute('stroke-width', '5');
         path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
         svg.appendChild(path);
         linePaths[routeId] = path;
     }
 }
 
-// **NEW FUNCTION** to align stations and draw them
-function snapAndDrawStations(data) {
-    const { stops } = data;
-    
-    stops.forEach(stop => {
-        const realPos = project(stop.lat, stop.lon);
-        let bestPosition = null;
-        let minDistance = Infinity;
-
-        // Find the closest path segment for this station
-        const routeId = stop.line.includes('blue') ? 'blue-line' : 'green-line';
+// **REWRITTEN** function to distribute stations evenly
+function distributeAndDrawStations() {
+    // Process each line and direction to calculate station positions
+    for (const lineId in lineStops) {
+        const stopIds = lineStops[lineId];
+        const routeId = lineId.includes('blue') ? 'blue-line' : 'green-line';
         const path = linePaths[routeId];
-        if (!path) return;
+        if (!path) continue;
 
         const totalLength = path.getTotalLength();
-        // Iterate along the path to find the closest point
-        for (let i = 0; i < totalLength; i += 1) { // Check every pixel
-            const pointOnPath = path.getPointAtLength(i);
-            const distance = getDistance(realPos, pointOnPath);
-            if (distance < minDistance) {
-                minDistance = distance;
-                bestPosition = pointOnPath;
-            }
-        }
-        
-        // Store the snapped position and draw the circle
-        if (bestPosition) {
-            stationData[stop.stop_id].snappedPosition = bestPosition; // Store for later
+
+        stopIds.forEach((stopId, index) => {
+            const proportion = index / (stopIds.length - 1);
+            const position = path.getPointAtLength(proportion * totalLength);
+            
+            // Store this calculated position. Interchange stations will be updated multiple times, which is fine.
+            stationData[stopId].visualPosition = position;
+        });
+    }
+
+    // Now draw all stations using their final calculated positions
+    for (const stopId in stationData) {
+        const stop = stationData[stopId];
+        if (stop.visualPosition) {
             const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            circle.setAttribute('cx', bestPosition.x);
-            circle.setAttribute('cy', bestPosition.y);
+            circle.setAttribute('cx', stop.visualPosition.x);
+            circle.setAttribute('cy', stop.visualPosition.y);
             circle.setAttribute('r', '6');
             circle.setAttribute('fill', 'white');
             circle.setAttribute('stroke', '#333');
             circle.setAttribute('stroke-width', '2');
-            
             const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
             title.textContent = stop.stop_name;
             circle.appendChild(title);
             svg.appendChild(circle);
         }
-    });
+    }
 }
 
-
-// --- [Code from section 5 is unchanged] ---
 // --- 5. SIMULATION ENGINE ---
 let activeTrains = {};
 function animationLoop(data) {
@@ -121,19 +116,13 @@ function animationLoop(data) {
     const day = nowIST.getDay();
     const dayType = day === 0 ? 'sunday' : day === 6 ? 'saturday' : 'weekday';
     const currentSchedule = data.schedule[dayType];
-    if (!currentSchedule) {
-        requestAnimationFrame(() => animationLoop(data));
-        return;
-    }
+    if (!currentSchedule) { requestAnimationFrame(() => animationLoop(data)); return; }
     const period = currentSchedule.find(p => {
         const start = timeToSeconds(p.start);
         const end = timeToSeconds(p.end);
         return currentTimeInSeconds >= start && currentTimeInSeconds <= end;
     });
-    if (!period) {
-        requestAnimationFrame(() => animationLoop(data));
-        return;
-    }
+    if (!period) { requestAnimationFrame(() => animationLoop(data)); return; }
     const allTrips = [];
     for (const routeId in period.headways_mins) {
         const headwaySeconds = period.headways_mins[routeId] * 60;
@@ -160,10 +149,10 @@ function animationLoop(data) {
                 const progress = (timeSinceStart - cumulativeTime) / segmentTravelTime;
                 const path = linePaths[trip.routeId];
                 const totalLength = path.getTotalLength();
-                const startDist = (i / (stopsOnLine.length - 1)) * totalLength;
-                const endDist = ((i + 1) / (stopsOnLine.length - 1)) * totalLength;
-                const currentDist = startDist + progress * (endDist - startDist);
-                trainPosition = path.getPointAtLength(currentDist);
+                const startProportion = i / (stopsOnLine.length - 1);
+                const endProportion = (i + 1) / (stopsOnLine.length - 1);
+                const currentProportion = startProportion + progress * (endProportion - startProportion);
+                trainPosition = path.getPointAtLength(currentProportion * totalLength);
                 break;
             }
             cumulativeTime += segmentTravelTime;
@@ -187,15 +176,13 @@ function animationLoop(data) {
     requestAnimationFrame(() => animationLoop(data));
 }
 
-
 // --- 6. INITIALIZATION ---
-// **MODIFIED** main function to call the new snapping function
 async function main() {
     const data = await loadData();
     preprocessData(data);
-    renderMap(data); // First, render the lines
-    snapAndDrawStations(data); // THEN, snap and render the stations
-    requestAnimationFrame(() => animationLoop(data)); // Finally, start the train animation
+    renderMap(data); 
+    distributeAndDrawStations(); // **MODIFIED** function call
+    requestAnimationFrame(() => animationLoop(data));
 }
 
 main();
