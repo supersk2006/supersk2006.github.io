@@ -1,0 +1,62 @@
+{
+  "weekday": [
+    {
+      "period": "non_peak_morning",
+      "start": "05:00:00",
+      "end": "08:00:00",
+      "headways_mins": {
+        "blue-line": 7,
+        "green-line": 14
+      }
+    },
+    {
+      "period": "peak",
+      "start": "08:00:01",
+      "end": "11:00:00",
+      "headways_mins": {
+        "blue-line": 6,
+        "green-line": 12,
+        "blue-line-shortloop": 3,
+        "green-line-shortloop": 6
+      }
+    },
+    {
+      "period": "non_peak_midday",
+      "start": "11:00:01",
+      "end": "17:00:00",
+      "headways_mins": {
+        "blue-line": 7,
+        "green-line": 14
+      }
+    },
+    {
+      "period": "evening_peak",
+      "start": "17:00:01",
+      "end": "20:00:00",
+      "headways_mins": {
+        "blue-line": 6,
+        "green-line": 12,
+        "blue-line-shortloop": 3,
+        "green-line-shortloop": 6
+      }
+    },
+    {
+      "period": "non_peak_night",
+      "start": "20:00:01",
+      "end": "22:00:00",
+      "headways_mins": {
+        "blue-line": 7,
+        "green-line": 14
+      }
+    },
+    {
+      "period": "late_night",
+      "start": "22:00:01",
+      "end": "23:00:00",
+      "headways_mins": {
+        "blue-line": 15,
+        "green-line": 30
+      }
+    }
+  ]
+}

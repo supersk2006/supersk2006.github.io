@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF--8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: Chennai Metro Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+        
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Live Chennai Metro Simulation</h1>
+            <p class="text-lg text-indigo-400">A real-time, schedule-based visualization project.</p>
+        </div>
+
+        <div class="max-w-7xl mx-auto">
+            
+            <div class="bg-gray-800 rounded-lg shadow-lg p-4 md:p-6 flex justify-center border border-gray-700">
+                <svg id="metro-map" width="1200" height="800" class="bg-gray-900 rounded"></svg>
+            </div>
+
+            <div class="mt-12 bg-gray-800 rounded-lg shadow-lg p-8 md:p-10">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-4 border-l-4 border-indigo-500 pl-4">How It Works</h2>
+                    <p class="text-gray-300 leading-relaxed">
+                        This visualization is not a live tracker but a realistic simulation based on the official Chennai Metro timetable. A JavaScript engine running in your browser uses the current time to determine which trains should be running based on the scheduled frequency (peak vs. non-peak hours). It then calculates the precise position of each active train by interpolating its location between stations and renders it smoothly on the SVG map using a `requestAnimationFrame` loop.
+                    </p>
+                </div>
+                
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-4 border-l-4 border-indigo-500 pl-4">Technology Stack</h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center mt-4">
+                        <div class="bg-gray-700 p-4 rounded-lg"><p>HTML5</p></div>
+                        <div class="bg-gray-700 p-4 rounded-lg"><p>Tailwind CSS</p></div>
+                        <div class="bg-gray-700 p-4 rounded-lg"><p>JavaScript (ES6+)</p></div>
+                        <div class="bg-gray-700 p-4 rounded-lg"><p>SVG</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-16">
+            <a href="index.html#projects" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 transform hover:scale-105">
+                &larr; Back to Portfolio
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-900 py-8 mt-12">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&
