@@ -1,0 +1,14 @@
+[
+  {
+    "route_id": "blue-line",
+    "route_name": "Blue Line",
+    "color": "#0055A5",
+    "description": "Wimco Nagar Depot to Chennai International Airport"
+  },
+  {
+    "route_id": "green-line",
+    "route_name": "Green Line",
+    "color": "#00834D",
+    "description": "Puratchi Thalaivar Dr. M.G. Ramachandran Central Metro to St. Thomas Mount"
+  }
+]

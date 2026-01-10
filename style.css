@@ -1,0 +1,99 @@
+/* Linear.app-inspired Design System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base Theme */
+body {
+    background-color: #0E0E10; /* Deep Void */
+    color: #A1A1AA; /* Zinc 400 */
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+    color: #F4F4F5; /* Zinc 100 */
+    letter-spacing: -0.02em;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Utilities */
+.glass-panel {
+    background: rgba(22, 22, 26, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-linear {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-linear:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Text Gradients */
+.text-gradient-primary {
+    background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-secondary {
+    background: linear-gradient(135deg, #F97316 0%, #EC4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Animations */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.glow-blob {
+    position: absolute;
+    filter: blur(80px);
+    opacity: 0.4;
+    z-index: -1;
+    animation: pulse-glow 8s infinite alternate;
+}
+
+@keyframes pulse-glow {
+    0% { opacity: 0.3; transform: scale(1); }
+    100% { opacity: 0.5; transform: scale(1.1); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0E0E10; 
+}
+::-webkit-scrollbar-thumb {
+    background: #27272A; 
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #3F3F46; 
+}

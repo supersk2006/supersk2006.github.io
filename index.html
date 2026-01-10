@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Krishna S | Electrical Engineer</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Config -->
+    <script src="tailwind-config.js"></script>
+
+    <!-- Global Styles & Fonts -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[#0E0E10] text-[#A1A1AA] antialiased selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
+
+    <!-- Background Ambient Glow -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="glow-blob bg-indigo-600/10 w-[800px] h-[800px] top-[-10%] left-[-10%] rounded-full mix-blend-screen blur-[120px]"></div>
+        <div class="glow-blob bg-purple-600/10 w-[800px] h-[800px] bottom-[-10%] right-[-10%] rounded-full mix-blend-screen blur-[120px] animation-delay-2000"></div>
+    </div>
+
+    <!-- 1. Header (Glass) -->
+    <header class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5 bg-[#0E0E10]/80 backdrop-blur-xl">
+        <div class="container mx-auto px-6 h-full flex items-center justify-between">
+            <a href="#home" class="text-sm font-bold text-white font-heading tracking-tight hover:text-white/80 transition-colors">
+                Sri Krishna S.
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#home" class="text-xs font-medium text-zinc-400 hover:text-white transition-colors">Overview</a>
+                <a href="#story" class="text-xs font-medium text-zinc-400 hover:text-white transition-colors">Story</a>
+                <a href="#work" class="text-xs font-medium text-zinc-400 hover:text-white transition-colors">Work</a>
+                <a href="#contact" class="text-xs font-medium text-zinc-400 hover:text-white transition-colors">Contact</a>
+            </nav>
+
+            <a href="#contact" class="hidden md:inline-flex px-4 py-1.5 text-xs font-medium text-white bg-white/10 hover:bg-white/15 border border-white/5 rounded-full transition-all">
+                Get in touch
+            </a>
+        </div>
+    </header>
+
+    <main class="relative z-10 pt-32 pb-20">
+
+        <!-- 2. Hero Section -->
+        <section id="home" class="container mx-auto px-6 h-[70vh] flex flex-col justify-center items-center text-center">
+            
+            <!-- Badge -->
+            <div class="inline-flex items-center px-3 py-1 mb-8 rounded-full border border-indigo-500/30 bg-indigo-500/10 animate-float">
+                <span class="flex h-2 w-2 relative mr-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+                </span>
+                <span class="text-[11px] font-medium text-indigo-300 font-mono tracking-wide">AVAILABLE FOR WORK</span>
+            </div>
+
+            <!-- H1 -->
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-white font-heading tracking-tight mb-8 leading-[1.1] max-w-5xl">
+                Electrical Engineer & <br />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Embedded Developer.</span>
+            </h1>
+
+            <!-- Subtext -->
+            <p class="text-lg text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+                Bridging the gap between hardware logic and software interface. I design precise control systems and visualize them on the modern web.
+            </p>
+
+            <!-- CTA -->
+            <div class="flex items-center gap-4">
+                <a href="#work" class="h-11 px-8 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center">
+                    View Work
+                </a>
+                <a href="https://github.com/supersk2006" target="_blank" class="h-11 px-8 rounded-full bg-white/5 border border-white/10 text-white text-sm font-medium hover:bg-white/10 transition-all flex items-center justify-center">
+                    GitHub
+                </a>
+            </div>
+        </section>
+
+        <!-- 3. Experience & Skills (Bento Grid) -->
+        <section id="story" class="container mx-auto px-6 py-24">
+            <h2 class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-12 text-center">Engineering Profile</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                
+                <!-- Profile Card (Full Width Hero) -->
+                <div class="md:col-span-3 rounded-3xl bg-[#16161A] border border-white/5 p-8 md:p-12 relative group overflow-hidden hover:border-white/10 transition-colors">
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-[100px]"></div>
+                    <div class="flex flex-col md:flex-row items-center gap-12 relative z-10">
+                        <!-- Profile Pic with Glow (Enlarged) -->
+                        <div class="relative shrink-0">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-full blur-xl opacity-20 group-hover:opacity-50 transition-opacity duration-500"></div>
+                            <img src="resources/pf.jpg" alt="Profile" class="relative w-40 h-40 md:w-56 md:h-56 rounded-full object-cover border-4 border-white/5 shadow-2xl hover:scale-[1.02] transition-transform duration-500">
+                        </div>
+                        <div class="text-center md:text-left flex-1">
+                            <h3 class="text-3xl font-bold text-white mb-6 font-heading tracking-tight">About Me</h3>
+                            <p class="text-zinc-300 text-lg leading-relaxed mb-6 font-light">
+                                I'm studying <strong class="text-white font-medium">Electrical & Electronics Engineering</strong> at Rajalakshmi Engineering College. My passion lies in deeply understanding how complex power systems work and then building the precision digital tools to control them.
+                            </p>
+                            <p class="text-indigo-400 text-sm font-mono tracking-wide bg-indigo-500/10 inline-block px-4 py-2 rounded-lg border border-indigo-500/20">
+                                // Circuits + Code = Magic
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Card (1/3 Width) -->
+                <div class="md:col-span-1 rounded-3xl bg-[#16161A] border border-white/5 p-8 flex flex-col justify-center items-center text-center hover:border-white/10 transition-colors relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
+                    <div class="relative z-10">
+                        <span class="block text-7xl font-bold text-white font-mono tracking-tighter mb-2">3+</span>
+                        <span class="text-[11px] font-bold text-indigo-400 uppercase tracking-widest">Years Experience</span>
+                        <p class="text-zinc-500 text-xs mt-3">Academic & Research Projects</p>
+                    </div>
+                </div>
+
+                <!-- Tech List (2/3 Width) -->
+                <div class="md:col-span-2 rounded-3xl bg-[#16161A] border border-white/5 p-8 hover:border-white/10 transition-colors flex flex-col justify-center">
+                    <h3 class="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-6">Technical Arsenal</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        
+                        <!-- Row 1 -->
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <span class="text-sm text-zinc-400">Programming</span>
+                            <span class="text-sm font-mono text-white">C, Python</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <span class="text-sm text-zinc-400">3D Design</span>
+                            <span class="text-sm font-mono text-white">SolidWorks, CATIA, Fusion</span>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <span class="text-sm text-zinc-400">Math Computing</span>
+                            <span class="text-sm font-mono text-white">MATLAB / Simulink</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-white/5">
+                            <span class="text-sm text-zinc-400">Circuit Design</span>
+                            <span class="text-sm font-mono text-white">Proteus Simulation</span>
+                        </div>
+
+                        <!-- Row 3 (Full Width Span) -->
+                        <div class="md:col-span-2 flex justify-between items-center py-2 border-b border-white/5">
+                            <span class="text-sm text-zinc-400">Web Technologies</span>
+                            <span class="text-sm font-mono text-white">Scraping, Tailwind, React</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 4. Projects (Showcase Grid) -->
+        <section id="work" class="container mx-auto px-6 py-24 border-t border-white/5">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h2 class="text-3xl font-bold text-white font-heading mb-2">Selected Work</h2>
+                    <p class="text-zinc-500 text-sm">Hardware interfaces and web utilities.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Project 1 -->
+                <a href="projects/edc/" class="group block rounded-2xl bg-[#16161A] border border-white/5 overflow-hidden hover:border-blue-500/50 hover:shadow-[0_0_30px_-10px_rgba(59,130,246,0.3)] transition-all duration-300">
+                    <div class="h-48 bg-zinc-900 relative overflow-hidden">
+                        <img src="resources/edcimg.png" alt="Light System" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#16161A] to-transparent"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Garden Light System</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                            Automated intensity control using LDR sensors. Focuses on energy efficiency and smart actuation.
+                        </p>
+                        <div class="flex gap-2">
+                             <span class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-white/5 text-zinc-400">Hardware</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Project 2 -->
+                <a href="projects/ieee/" class="group block rounded-2xl bg-[#16161A] border border-white/5 overflow-hidden hover:border-teal-500/50 hover:shadow-[0_0_30px_-10px_rgba(20,184,166,0.3)] transition-all duration-300">
+                    <div class="h-48 bg-zinc-900 relative overflow-hidden">
+                        <img src="resources/ieeeimg.png" alt="Windmills" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#16161A] to-transparent"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-teal-400 transition-colors">Highway Windmills</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                            Renewable energy concept leveraging highway airflow. Innovative infrastructure integration.
+                        </p>
+                        <div class="flex gap-2">
+                             <span class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-white/5 text-zinc-400">Concept</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Project 3 -->
+                <a href="projects/cgpa/" class="group block rounded-2xl bg-[#16161A] border border-white/5 overflow-hidden hover:border-purple-500/50 hover:shadow-[0_0_30px_-10px_rgba(168,85,247,0.3)] transition-all duration-300">
+                    <div class="h-48 bg-zinc-900 relative overflow-hidden">
+                        <img src="resources/cgpaimg.png" alt="CGPA Calc" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#16161A] to-transparent"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">CGPA Calculator</h3>
+                        <p class="text-zinc-400 text-sm leading-relaxed mb-4">
+                            Web utility for engineering students. Features live calculation and CSV export.
+                        </p>
+                        <div class="flex gap-2">
+                             <span class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-white/5 text-zinc-400">Web App</span>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- 5. Contact (Minimal) -->
+        <section id="contact" class="container mx-auto px-6 py-24 pb-32 border-t border-white/5">
+            <div class="rounded-3xl bg-gradient-to-b from-[#16161A] to-[#0E0E10] border border-white/5 p-12 text-center max-w-2xl mx-auto">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-heading">Ready to Collaborate?</h2>
+                <p class="text-zinc-500 text-lg mb-8">
+                    Open to internships and project collaborations.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                     <a href="mailto:srikrishna.s.2006@gmail.com" class="px-8 py-3 rounded-full bg-white text-zinc-900 font-bold hover:bg-zinc-200 transition-colors flex items-center justify-center">
+                        Get in touch
+                    </a>
+                     <a href="https://www.linkedin.com/in/srikrishnas37/" target="_blank" class="px-8 py-3 rounded-full bg-white/10 text-white font-bold hover:bg-white/20 transition-colors flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                        LinkedIn
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="py-8 bg-[#0E0E10] border-t border-white/5 text-center">
+        <p class="text-xs text-zinc-600 font-mono">STATUS: SYSTEMS NORMAL • 2024</p>
+    </footer>
+
+    <!-- 6. Script: Clean URL & Smooth Scroll -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

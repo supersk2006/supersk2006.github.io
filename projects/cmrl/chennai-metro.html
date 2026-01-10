@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: Chennai Metro Simulation | Supersk</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Config & Styles -->
+    <script src="../../tailwind-config.js"></script>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="bg-[#0E0E10] text-[#A1A1AA] antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+    
+    <!-- Background Glow -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/5 rounded-full blur-[120px] mix-blend-screen"></div>
+    </div>
+
+    <!-- 1. Header (Glass) -->
+    <header class="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/5 bg-[#0E0E10]/80 backdrop-blur-xl">
+        <div class="container mx-auto px-6 h-full flex items-center justify-between">
+            <a href="../../index.html" class="flex items-center text-zinc-400 hover:text-white transition-colors text-sm font-medium group">
+                <svg class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Back to Portfolio
+            </a>
+            <span class="text-xs font-mono text-zinc-600">SIMULATION ENGINE</span>
+        </div>
+    </header>
+
+    <main class="relative z-10 container mx-auto px-6 py-24 min-h-screen flex flex-col justify-center">
+        
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white font-heading tracking-tight mb-4">
+                Chennai Metro Live
+            </h1>
+            <p class="text-zinc-500 text-lg">
+                Real-time visualization based on official timetables.
+            </p>
+        </div>
+
+        <!-- Simulation Container -->
+        <div class="w-full max-w-6xl mx-auto rounded-3xl bg-[#16161A] border border-white/5 p-2 shadow-2xl relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 z-0 pointer-events-none"></div>
+            <!-- SVG Map Container -->
+            <div class="relative z-10 bg-[#111113] rounded-[22px] overflow-hidden aspect-[3/2] border border-white/5">
+                <svg id="metro-map" viewBox="0 0 1200 800" class="w-full h-full"></svg>
+            </div>
+            
+            <!-- Controls Overlay (Mockup for now, logic handled by main.js) -->
+            <div class="absolute bottom-6 right-6 flex gap-2">
+                <span class="px-3 py-1 rounded bg-black/60 backdrop-blur text-xs font-mono text-zinc-400 border border-white/5">LIVE FEED</span>
+            </div>
+        </div>
+
+        <!-- Tech Details Grid -->
+        <div class="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            <div class="md:col-span-2 rounded-2xl bg-[#16161A] border border-white/5 p-8">
+                 <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Simulation Logic</h2>
+                 <p class="text-zinc-400 text-sm leading-relaxed">
+                     This visualization renders a realistic Metro network state utilizing <strong class="text-white">Vanilla JavaScript</strong> and SVG manipulation. It fetches timetable data, calculates train positions via linear interpolation, and updates the view at 60FPS using <code class="bg-white/10 px-1 rounded">requestAnimationFrame</code>.
+                 </p>
+            </div>
+            <div class="rounded-2xl bg-[#16161A] border border-white/5 p-8">
+                 <h2 class="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-4">Tech Stack</h2>
+                 <ul class="space-y-2">
+                     <li class="px-3 py-2 rounded bg-white/5 text-zinc-300 text-xs font-mono border border-white/5">HTML5 SVG + Canvas</li>
+                     <li class="px-3 py-2 rounded bg-white/5 text-zinc-300 text-xs font-mono border border-white/5">Vanilla JS (ES6+)</li>
+                     <li class="px-3 py-2 rounded bg-white/5 text-zinc-300 text-xs font-mono border border-white/5">Tailwind CSS</li>
+                 </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 py-8 bg-[#0E0E10] mt-12 text-center">
+        <p class="text-zinc-600 text-xs font-mono">&copy; 2024 Sri Krishna S.</p>
+    </footer>
+
+    <!-- Logic Script -->
+    <script src="main.js" defer></script>
+
+</body>
+</html>
