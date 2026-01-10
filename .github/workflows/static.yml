@@ -1,49 +1,44 @@
-# Example GitHub Pages static site workflow
 name: Build and Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Your build commands here (if any)
-      - name: Build static site
-        run: |
-          echo "No build required for static HTML"
-
-      # Upload artifact FIXED VERSION
-      - name: Upload build artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: site
-          path: ./  # or the path to your built files
+          path: ./
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # Download artifact FIXED VERSION
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: site
 
-      - name: Deploy to GitHub Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v4
 
       - name: Upload to GitHub Pages
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
 
       - name: Deploy
         uses: actions/deploy-pages@v4
