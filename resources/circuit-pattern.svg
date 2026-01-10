@@ -1,0 +1,41 @@
+<svg width="3840" height="2160" viewBox="0 0 3840 2160" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a12"/>
+      <stop offset="50%" stop-color="#141428"/>
+      <stop offset="100%" stop-color="#1a1a30"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="3840" height="2160" fill="url(#bg)" />
+
+  <!-- Circuit Lines Group -->
+  <g stroke="rgba(255,255,255,0.10)" 
+     stroke-width="2" 
+     fill="none" 
+     stroke-linecap="round">
+
+    <!-- Main flowing circuitry -->
+    <path d="M300 450 C700 300, 1200 500, 1600 380 S2400 420, 2900 350 S3300 300, 3600 500" />
+    <path d="M500 1200 C900 1000, 1500 1350, 2000 1150 S2800 1100, 3300 1200" />
+    <path d="M600 800 C1000 900, 1600 700, 2100 850 S2800 1000, 3300 900" />
+
+    <!-- Secondary branches -->
+    <path d="M900 450 C850 600, 900 750, 1000 900" />
+    <path d="M1600 380 C1550 500, 1550 650, 1600 800" />
+    <path d="M2400 420 C2450 600, 2550 800, 2700 900" />
+    <path d="M2900 350 C2950 500, 3000 700, 3150 900" />
+
+    <!-- Node circles -->
+    <circle cx="900" cy="450" r="12" fill="rgba(255,255,255,0.12)" />
+    <circle cx="1600" cy="380" r="12" fill="rgba(255,255,255,0.12)" />
+    <circle cx="2400" cy="420" r="12" fill="rgba(255,255,255,0.12)" />
+    <circle cx="2900" cy="350" r="12" fill="rgba(255,255,255,0.12)" />
+    <circle cx="1000" cy="900" r="12" fill="rgba(255,255,255,0.12)" />
+    <circle cx="2700" cy="900" r="12" fill="rgba(255,255,255,0.12)" />
+    <circle cx="3150" cy="900" r="12" fill="rgba(255,255,255,0.12)" />
+
+  </g>
+</svg>

@@ -13,8 +13,107 @@
 
     <!-- Global Styles & Fonts -->
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Entrance Animations */
+        @keyframes page-load {
+            0% { opacity: 0; transform: scale(0.97); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fade-slide-up {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-page-load {
+            opacity: 0;
+            animation: page-load 0.8s ease-out forwards;
+        }
+        .fade-stagger {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fade-slide-up 0.8s ease-out forwards;
+        }
+        .fade-delay-1 { animation-delay: 0.15s; }
+        .fade-delay-2 { animation-delay: 0.25s; }
+        .fade-delay-3 { animation-delay: 0.35s; }
+        .fade-delay-4 { animation-delay: 0.50s; }
+        
+        .scroll-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .scroll-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .animate-page-load, .fade-stagger, .scroll-hidden {
+                animation: none !important;
+                transition: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+        /* Hero Background PCB Pattern */
+        /* Hero Background PCB Pattern */
+        .hero {
+            width: 100vw;
+            max-width: 100vw;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100vw;
+            height: 100%;
+            transform: translateX(-50%);
+            background-image: url("resources/circuit-pattern.svg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(to bottom, rgba(14,14,16,0) 0%, rgba(14,14,16,1) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            overflow-x: hidden;
+        }
+    </style>
 </head>
-<body class="bg-[#0E0E10] text-[#A1A1AA] antialiased selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden">
+<body class="bg-[#0E0E10] text-[#A1A1AA] antialiased selection:bg-indigo-500/30 selection:text-indigo-200 overflow-x-hidden animate-page-load">
 
     <!-- Background Ambient Glow -->
     <div class="fixed inset-0 pointer-events-none z-0">
@@ -42,33 +141,33 @@
         </div>
     </header>
 
-    <main class="relative z-10 pt-32 pb-20">
+    <main class="relative z-10">
 
         <!-- 2. Hero Section -->
-        <section id="home" class="container mx-auto px-6 h-[70vh] flex flex-col justify-center items-center text-center">
+        <!-- 2. Hero Section -->
+        <!-- 2. Hero Section -->
+        <section id="home" class="h-screen hero relative">
+            <div class="hero-content">
             
             <!-- Badge -->
-            <div class="inline-flex items-center px-3 py-1 mb-8 rounded-full border border-indigo-500/30 bg-indigo-500/10 animate-float">
-                <span class="flex h-2 w-2 relative mr-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
-                </span>
-                <span class="text-[11px] font-medium text-indigo-300 font-mono tracking-wide">AVAILABLE FOR WORK</span>
+            <div class="inline-flex items-center px-[18px] py-[8px] mb-8 rounded-full border border-indigo-500/20 bg-indigo-500/10 backdrop-blur-sm animate-float fade-stagger fade-delay-1">
+                <span class="text-blue-400 mr-3 text-xs">●</span>
+                <span class="text-[16px] font-medium text-indigo-200 font-mono tracking-wide"><strong class="font-bold text-white">Sri Krishna S.</strong> — Available for Work</span>
             </div>
 
             <!-- H1 -->
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-white font-heading tracking-tight mb-8 leading-[1.1] max-w-5xl">
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold text-white font-heading tracking-tight mb-8 leading-[1.1] max-w-5xl fade-stagger fade-delay-2">
                 Electrical Engineer & <br />
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Embedded Developer.</span>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 fade-stagger fade-delay-3">Embedded Developer.</span>
             </h1>
 
             <!-- Subtext -->
-            <p class="text-lg text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-                Bridging the gap between hardware logic and software interface. I design precise control systems and visualize them on the modern web.
+            <p class="text-lg text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-light fade-stagger fade-delay-4">
+                Bridging the gap between hardware logic and software interface.
             </p>
 
             <!-- CTA -->
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 fade-stagger fade-delay-4">
                 <a href="#work" class="h-11 px-8 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] transition-all flex items-center justify-center">
                     View Work
                 </a>
@@ -76,10 +175,11 @@
                     GitHub
                 </a>
             </div>
+            </div>
         </section>
 
         <!-- 3. Experience & Skills (Bento Grid) -->
-        <section id="story" class="container mx-auto px-6 py-24">
+        <section id="story" class="container mx-auto px-6 py-24 scroll-hidden scroll-trigger">
             <h2 class="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-12 text-center">Engineering Profile</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -154,7 +254,7 @@
         </section>
 
         <!-- 4. Projects (Showcase Grid) -->
-        <section id="work" class="container mx-auto px-6 py-24 border-t border-white/5">
+        <section id="work" class="container mx-auto px-6 py-24 border-t border-white/5 scroll-hidden scroll-trigger">
             <div class="flex justify-between items-end mb-12">
                 <div>
                     <h2 class="text-3xl font-bold text-white font-heading mb-2">Selected Work</h2>
@@ -219,7 +319,7 @@
         </section>
 
         <!-- 5. Contact (Minimal) -->
-        <section id="contact" class="container mx-auto px-6 py-24 pb-32 border-t border-white/5">
+        <section id="contact" class="container mx-auto px-6 py-24 pb-32 border-t border-white/5 scroll-hidden scroll-trigger">
             <div class="rounded-3xl bg-gradient-to-b from-[#16161A] to-[#0E0E10] border border-white/5 p-12 text-center max-w-2xl mx-auto">
                 <h2 class="text-3xl md:text-4xl font-bold text-white mb-4 font-heading">Ready to Collaborate?</h2>
                 <p class="text-zinc-500 text-lg mb-8">
@@ -257,5 +357,22 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("scroll-visible");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll(".scroll-trigger").forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
+
 </body>
 </html>
