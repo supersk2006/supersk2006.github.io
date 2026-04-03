@@ -26,8 +26,8 @@ The website is built using core web technologies to ensure lightweight delivery 
 If you have any questions or would like to connect, feel free to reach out:
 
 * **GitHub:** [supersk2006](https://github.com/supersk2006)
-* **Email:** [Your Email Address]
-* **LinkedIn:** [Your LinkedIn Profile]
+* **Email:** [srikrishna.s.2006@gmail.com](mailto:srikrishna.s.2006@gmail.com)
+* **LinkedIn:** [srikrishnas37](https://www.linkedin.com/in/srikrishnas37/)
 
 ## License
 
