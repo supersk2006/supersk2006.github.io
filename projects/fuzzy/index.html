@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Interactive Fuzzy Logic quiz with 144 unique questions, instant feedback, and detailed explanations.">
+    <title>Fuzzy Logic Mastery — Quiz</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Animated background -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <main id="app">
+
+        <!-- ========== SCREEN: LANDING ========== -->
+        <section id="screen-landing" class="screen active">
+            <div class="glass-card landing-card">
+                <div class="landing-icon">🧠</div>
+                <h1 class="landing-title">Fuzzy Logic<br><span>Mastery</span></h1>
+                <p class="landing-subtitle">144 curated questions covering Fuzzy Sets, Inference Systems, Membership Functions, and more — with detailed explanations.</p>
+
+                <div class="quiz-size-picker">
+                    <label class="picker-label">How many questions?</label>
+                    <div class="size-options">
+                        <button class="size-btn active" data-count="15">15</button>
+                        <button class="size-btn" data-count="30">30</button>
+                        <button class="size-btn" data-count="50">50</button>
+                        <button class="size-btn" data-count="144">All 144</button>
+                    </div>
+                </div>
+
+                <button id="btn-start" class="btn btn-glow">
+                    <span>Start Quiz</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+            </div>
+        </section>
+
+        <!-- ========== SCREEN: QUIZ ========== -->
+        <section id="screen-quiz" class="screen">
+            <!-- Top bar -->
+            <div class="quiz-topbar">
+                <button id="btn-quit" class="btn btn-icon" title="Quit quiz">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="topbar-center">
+                    <span id="quiz-difficulty-badge" class="diff-badge easy">Easy</span>
+                </div>
+                <div class="topbar-score">
+                    <span id="live-score">0</span> correct
+                </div>
+            </div>
+
+            <!-- Progress -->
+            <div class="progress-track">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div class="progress-label">
+                <span id="q-index">1</span> <span class="dim">of</span> <span id="q-total">30</span>
+            </div>
+
+            <!-- Question card -->
+            <div class="glass-card quiz-card">
+                <p id="question-text" class="q-text">Loading…</p>
+                <div id="options-list" class="options-list"></div>
+            </div>
+
+            <!-- Explanation card (hidden until answered) -->
+            <div id="explanation-card" class="glass-card explanation-card hidden">
+                <div id="feedback-icon" class="feedback-icon">✓</div>
+                <p id="explanation-text" class="explanation-text"></p>
+            </div>
+
+            <!-- Next button -->
+            <div id="nav-bar" class="nav-bar hidden">
+                <button id="btn-next" class="btn btn-glow btn-sm">Next →</button>
+            </div>
+        </section>
+
+        <!-- ========== SCREEN: RESULTS ========== -->
+        <section id="screen-results" class="screen">
+            <div class="glass-card results-card">
+                <div id="res-emoji" class="res-emoji">🏆</div>
+                <h2 class="res-title">Quiz Complete!</h2>
+                <div class="res-score-ring">
+                    <svg viewBox="0 0 120 120" class="ring-svg">
+                        <circle cx="60" cy="60" r="54" class="ring-bg"/>
+                        <circle cx="60" cy="60" r="54" class="ring-fg" id="ring-fg"/>
+                    </svg>
+                    <div class="ring-label">
+                        <span id="res-score" class="ring-number">0</span>
+                        <span class="ring-denom">/ <span id="res-total">30</span></span>
+                    </div>
+                </div>
+                <p id="res-pct" class="res-pct">0%</p>
+                <p id="res-message" class="res-message">Great effort!</p>
+
+                <div class="breakdown">
+                    <div class="bd-item" id="bd-easy"><span class="bd-dot dot-easy"></span><span class="bd-label">Easy</span><span class="bd-val">—</span></div>
+                    <div class="bd-item" id="bd-medium"><span class="bd-dot dot-medium"></span><span class="bd-label">Medium</span><span class="bd-val">—</span></div>
+                    <div class="bd-item" id="bd-hard"><span class="bd-dot dot-hard"></span><span class="bd-label">Hard</span><span class="bd-val">—</span></div>
+                </div>
+
+                <div class="res-actions">
+                    <button id="btn-review" class="btn btn-glow">Review Answers</button>
+                    <button id="btn-retry" class="btn btn-ghost">New Quiz</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== SCREEN: REVIEW ========== -->
+        <section id="screen-review" class="screen">
+            <div class="review-header">
+                <h2>Answer Review</h2>
+                <button id="btn-back-results" class="btn btn-ghost btn-sm">← Results</button>
+            </div>
+            <div id="review-list" class="review-list"></div>
+            <div class="review-footer">
+                <button id="btn-new-quiz" class="btn btn-glow">New Quiz</button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Quit modal -->
+    <div id="modal-quit" class="modal-overlay hidden">
+        <div class="glass-card modal-card">
+            <h3>Quit Quiz?</h3>
+            <p>Your progress will be lost.</p>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="btn btn-ghost">Cancel</button>
+                <button id="modal-confirm" class="btn btn-danger">Quit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
